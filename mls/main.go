@@ -1,8 +1,6 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -12,17 +10,12 @@ import (
 )
 
 func main() {
-	if len(flag.Args()) < 1 {
+	if len(os.Args) < 2 {
 		log.Fatal("remote path must be supplied")
 	}
-	client := manta.Client{
-		User:  MANTA_USER,
-		KeyId: MANTA_KEY_ID,
-		Key:   MANTA_KEY,
-		Url:   MANTA_URL,
-	}
-	url := fmt.Sprintf("%s%s", client.Url, flag.Args()[0])
-	req, err := http.NewRequest("GET", url, nil)
+	client := manta.DefaultClient()
+	client.Key += "_manta"
+	req, err := client.NewRequest("GET", os.Args[1], nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,7 +3,12 @@ package manta
 import (
 	"encoding/base64"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"os/user"
+	"path/filepath"
 	"time"
 )
 
@@ -14,6 +19,44 @@ type Client struct {
 	Key    string
 	Url    string
 	signer Signer
+}
+
+func mustHomedir() string {
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal("manta: could not determine home directory: %v", err)
+	}
+	return user.HomeDir
+}
+
+// DefaultClient returns a Client instance configured from the
+// default Manta environment variables.
+func DefaultClient() *Client {
+	user := os.Getenv("MANTA_USER")
+	if user == "" {
+		log.Fatal("manta: MANTA_USER not defined or empty")
+	}
+	keyid := os.Getenv("MANTA_KEY_ID")
+	if keyid == "" {
+		log.Fatal("manta: MANTA_KEY_ID not defined or empty")
+	}
+	url := os.Getenv("MANTA_URL")
+	if url == "" {
+		log.Fatal("manta: MANTA_URL not defined or empty")
+	}
+	return &Client{
+		User:  user,
+		KeyId: keyid,
+		Key:   filepath.Join(mustHomedir(), ".ssh", "id_rsa"),
+		Url:   url,
+	}
+}
+
+// NewRequest is similar to http.NewRequest except it appends path to
+// the API endpoint this client is configured for.
+func (c *Client) NewRequest(method, path string, r io.Reader) (*http.Request, error) {
+	url := fmt.Sprintf("%s%s", c.Url, path)
+	return http.NewRequest(method, url, r)
 }
 
 func (c *Client) SignRequest(req *http.Request) error {
