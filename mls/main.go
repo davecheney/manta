@@ -14,12 +14,16 @@ import (
 	"github.com/davecheney/manta"
 )
 
+func init() {
+	manta.Flags.Parse(os.Args[1:])
+}
+
 func main() {
-	if len(os.Args) < 2 {
+	if len(manta.Flags.Args()) < 1 {
 		log.Fatal("remote path must be supplied")
 	}
 	client := manta.DefaultClient()
-	req, err := client.NewRequest("GET", os.Args[1], nil)
+	req, err := client.NewRequest("GET", manta.Flags.Args()[0], nil)
 	if err != nil {
 		log.Fatal(err)
 	}

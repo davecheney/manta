@@ -46,10 +46,6 @@ func mustHomedir() string {
 // DefaultClient returns a Client instance configured from the
 // default Manta environment variables.
 func DefaultClient() *Client {
-	user := os.Getenv("MANTA_USER")
-	if user == "" {
-		log.Fatal("manta: MANTA_USER not defined or empty")
-	}
 	keyid := os.Getenv("MANTA_KEY_ID")
 	if keyid == "" {
 		log.Fatal("manta: MANTA_KEY_ID not defined or empty")
@@ -59,7 +55,7 @@ func DefaultClient() *Client {
 		log.Fatal("manta: MANTA_URL not defined or empty")
 	}
 	return &Client{
-		User:  user,
+		User:  MANTA_USER,
 		KeyId: keyid,
 		Key:   filepath.Join(mustHomedir(), ".ssh", "id_rsa"),
 		Url:   url,
