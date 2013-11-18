@@ -20,7 +20,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"os/user"
 	"path/filepath"
 	"time"
@@ -46,19 +45,11 @@ func mustHomedir() string {
 // DefaultClient returns a Client instance configured from the
 // default Manta environment variables.
 func DefaultClient() *Client {
-	keyid := os.Getenv("MANTA_KEY_ID")
-	if keyid == "" {
-		log.Fatal("manta: MANTA_KEY_ID not defined or empty")
-	}
-	url := os.Getenv("MANTA_URL")
-	if url == "" {
-		log.Fatal("manta: MANTA_URL not defined or empty")
-	}
 	return &Client{
 		User:  MANTA_USER,
-		KeyId: keyid,
+		KeyId: MANTA_KEY_ID,
 		Key:   filepath.Join(mustHomedir(), ".ssh", "id_rsa"),
-		Url:   url,
+		Url:   MANTA_URL,
 	}
 }
 

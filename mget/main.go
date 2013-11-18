@@ -22,7 +22,7 @@ func main() {
 		log.Fatal("remote path must be supplied")
 	}
 	client := manta.DefaultClient()
-	req, err := client.NewRequest("GET", manta.Flags.Args()[1], nil)
+	req, err := client.NewRequest("GET", manta.Flags.Args()[0], nil)
 	if err != nil {
 		log.Fatal(err)
 	}
