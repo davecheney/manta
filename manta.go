@@ -19,12 +19,12 @@ type Client struct {
 func (c *Client) SignRequest(req *http.Request) error {
 	if c.signer == nil {
 		var err error
-		c.signer, err = LoadPrivateKey(c.key)
+		c.signer, err = LoadPrivateKey(c.Key)
 		if err != nil {
-			return fmt.Errorf("could not load private key %q: %v", c.key, err)
+			return fmt.Errorf("could not load private key %q: %v", c.Key, err)
 		}
 	}
-	return SignRequest(req, c.User, c.KeyId, signer)
+	return SignRequest(req, c.User, c.KeyId, c.signer)
 }
 
 func SignRequest(req *http.Request, MANTA_USER, MANTA_KEY_ID string, priv Signer) error {
@@ -36,7 +36,6 @@ func SignRequest(req *http.Request, MANTA_USER, MANTA_KEY_ID string, priv Signer
 	}
 	sig := base64.StdEncoding.EncodeToString(signed)
 	authz := fmt.Sprintf("Signature keyId=%q,algorithm=%q,signature=%q", fmt.Sprintf("/%s/keys/%s", MANTA_USER, MANTA_KEY_ID), "rsa-sha256", sig)
-	println(authz)
 	req.Header.Set("Authorization", authz)
-	return nilA
+	return nil
 }

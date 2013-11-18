@@ -21,6 +21,7 @@ func main() {
 		Key:   MANTA_KEY,
 		Url:   MANTA_URL,
 	}
+	url := fmt.Sprintf("%s%s", client.Url, flag.Args()[0])
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
