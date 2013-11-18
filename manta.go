@@ -116,9 +116,6 @@ func parsePrivateKey(pemBytes []byte) (Signer, error) {
 
 // A Signer is can create signatures that verify against a public key.
 type Signer interface {
-	// PublicKey returns an associated PublicKey instance.
-	PublicKey() PublicKey
-
 	// Sign returns raw signature for the given data. This method
 	// will apply the hash specified for the keytype to the data.
 	Sign(data []byte) ([]byte, error)
@@ -135,32 +132,10 @@ func newSignerFromKey(k interface{}) (Signer, error) {
 	return sshKey, nil
 }
 
-// PublicKey is an abstraction of different types of public keys.
-type PublicKey interface {
-	// PrivateKeyAlgo returns the name of the encryption system.
-	PrivateKeyAlgo() string
-
-	// PublicKeyAlgo returns the algorithm for the public key,
-	// which may be different from PrivateKeyAlgo for certificates.
-	PublicKeyAlgo() string
-}
-
 type rsaPublicKey rsa.PublicKey
-
-func (r *rsaPublicKey) PrivateKeyAlgo() string {
-	return "ssh-rsa"
-}
-
-func (r *rsaPublicKey) PublicKeyAlgo() string {
-	return r.PrivateKeyAlgo()
-}
 
 type rsaPrivateKey struct {
 	*rsa.PrivateKey
-}
-
-func (r *rsaPrivateKey) PublicKey() PublicKey {
-	return (*rsaPublicKey)(&r.PrivateKey.PublicKey)
 }
 
 // Sign signs data with rsa-sha256
