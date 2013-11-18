@@ -1,3 +1,5 @@
+// mls - list directory contents.
+// http://apidocs.joyent.com/manta/mls.html
 package main
 
 import (
