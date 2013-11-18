@@ -11,4 +11,4 @@ installation
 usage
 -----
 
-See [godoc.org/github.com/davecheney/manta](http://godoc.org/github/com/davecheney/manta)
+See [godoc.org/github.com/davecheney/manta](http://godoc.org/github.com/davecheney/manta)
