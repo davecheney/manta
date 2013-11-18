@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -26,5 +29,30 @@ func main() {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	io.Copy(os.Stdout, resp.Body)
+	if resp.StatusCode != 200 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Fatalf("%s", body)
+	}
+	s := struct {
+		Name  string `json:"name"`
+		Type  string `json:"type"`
+		Mtime string `json:"mtime"`
+	}{}
+	d := json.NewDecoder(resp.Body)
+	for {
+		if err := d.Decode(&s); err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
+		}
+		if s.Type == "directory" {
+			fmt.Println(s.Name + "/")
+		} else {
+			fmt.Println(s.Name)
+		}
+	}
 }
