@@ -60,6 +60,7 @@ func (c *Client) NewRequest(method, path string, r io.Reader) (*http.Request, er
 	return http.NewRequest(method, url, r)
 }
 
+// SignRequest signs the 'date' field of req.
 func (c *Client) SignRequest(req *http.Request) error {
 	if c.signer == nil {
 		var err error
@@ -69,6 +70,28 @@ func (c *Client) SignRequest(req *http.Request) error {
 		}
 	}
 	return signRequest(req, fmt.Sprintf("/%s/keys/%s", MANTA_USER, MANTA_KEY_ID), c.signer)
+}
+
+// Get executes a GET request and returns the response.
+func (c *Client) Get(path string) (*http.Response, error) {
+	return c.Do("GET", path, nil)
+}
+
+// Put executes a PUT request and returns the response.
+func (c *Client) Put(path string, r io.Reader) (*http.Response, error) {
+	return c.Do("PUT", path, r)
+}
+
+// Do executes a method request and returns the response.
+func (c *Client) Do(method, path string, r io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(method, path, r)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.SignRequest(req); err != nil {
+		return nil, err
+	}
+	return http.DefaultClient.Do(req)
 }
 
 func signRequest(req *http.Request, keyid string, priv Signer) error {

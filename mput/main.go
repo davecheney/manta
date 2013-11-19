@@ -6,7 +6,6 @@ package main
 import (
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/davecheney/manta"
@@ -23,14 +22,7 @@ func main() {
 		log.Fatal("remote path must be supplied")
 	}
 	client := manta.DefaultClient()
-	req, err := client.NewRequest("PUT", flags.Arg(0), os.Stdin)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := client.SignRequest(req); err != nil {
-		log.Fatal(err)
-	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Put(flags.Arg(0), os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
