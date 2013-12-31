@@ -73,6 +73,11 @@ func (c *Client) SignRequest(req *http.Request) error {
 }
 
 // Get executes a GET request and returns the response.
+func (c *Client) Delete(path string) (*http.Response, error) {
+	return c.Do("DELETE", path, nil)
+}
+
+// Get executes a GET request and returns the response.
 func (c *Client) Get(path string) (*http.Response, error) {
 	return c.Do("GET", path, nil)
 }
