@@ -21,7 +21,10 @@ func main() {
 	if len(flags.Args()) < 1 {
 		log.Fatal("remote path must be supplied")
 	}
-	client := manta.DefaultClient()
+	client, err := manta.DefaultClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	resp, err := client.Delete(flags.Arg(0))
 	if err != nil {
 		log.Fatal(err)

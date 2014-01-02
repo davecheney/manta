@@ -5,8 +5,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"runtime"
 	"testing"
 )
+
+// another pretty useless test.
+func TestHomedir(t *testing.T) {
+	h, err := homeDir()
+	if h == "" || err != nil {
+		t.Fatal("homeDir fails on this platform", runtime.GOOS)
+	}
+}
 
 func TestParsePrivateKey(t *testing.T) {
 	data, err := ioutil.ReadFile("_testdata/id_rsa")

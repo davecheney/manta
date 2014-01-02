@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os/user"
 	"path/filepath"
@@ -34,23 +33,29 @@ type Client struct {
 	signer Signer
 }
 
-func mustHomedir() string {
-	user, err := user.Current()
+func homeDir() (dir string, err error) {
+	u, err := user.Current()
 	if err != nil {
-		log.Fatal("manta: could not determine home directory: %v", err)
+		return dir, fmt.Errorf("manta: could not determine home directory: %v", err)
 	}
-	return user.HomeDir
+	dir = u.HomeDir
+	return
 }
 
 // DefaultClient returns a Client instance configured from the
 // default Manta environment variables.
-func DefaultClient() *Client {
-	return &Client{
+func DefaultClient() (c *Client, err error) {
+	dir, err := homeDir()
+	if err != nil {
+		return
+	}
+	c = &Client{
 		User:  MANTA_USER,
 		KeyId: MANTA_KEY_ID,
-		Key:   filepath.Join(mustHomedir(), ".ssh", "id_rsa"),
+		Key:   filepath.Join(dir, ".ssh", "id_rsa"),
 		Url:   MANTA_URL,
 	}
+	return
 }
 
 // NewRequest is similar to http.NewRequest except it appends path to
