@@ -1,3 +1,7 @@
+// Copyright 2013-2014 Dave Cheney and Contributors.
+// All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 package manta
 
 import (
@@ -5,8 +9,82 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 )
+
+// another pretty useless test.
+func TestHomedir(t *testing.T) {
+	h, err := homeDir()
+	if h == "" || err != nil {
+		t.Fatal("homeDir fails on this platform", runtime.GOOS)
+	}
+}
+
+func TestDefaultClient(t *testing.T) {
+
+	c, err := DefaultClient()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.User != MANTA_USER {
+		t.Error(c.User, "!=", MANTA_USER)
+	}
+	if c.Url != MANTA_URL {
+		t.Error("URL != MANTA_URL")
+	}
+	if c.KeyId != MANTA_KEY_ID {
+		t.Error("User != MANTA_KEY_ID")
+	}
+	if strings.HasSuffix(c.Key, "/.ssh/id_rsa") == false {
+		t.Error("Unexpected client key: ", c.Key)
+	}
+}
+
+func TestClient(t *testing.T) {
+	MANTA_USER = os.Getenv("MANTA_USER")
+	MANTA_KEY_ID = os.Getenv("MANTA_KEY_ID")
+	if MANTA_USER != "" && MANTA_KEY_ID != "" {
+		MANTA_URL = "https://us-east.manta.joyent.com"
+		expected := "Hello, world!\n"
+		c, err := DefaultClient()
+		path := filepath.Join("/", MANTA_USER, "public", "test.txt")
+		r, err := os.Open("_testdata/test.txt")
+		if err != nil {
+			t.Fatal("Couldn't open test file: ", err)
+		}
+		resp, err := c.Put(path, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 204 {
+			t.Fatal("Failed to put test file: ", err)
+		}
+		resp, err = c.Get(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != expected {
+			t.Errorf("Expected: '%s' got: '%s'", expected, got)
+		}
+		resp, err = c.Delete(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 204 {
+			t.Error("Failed to delete test file:", err)
+		}
+	} else {
+		t.Skip("No credentials found")
+	}
+}
 
 func TestParsePrivateKey(t *testing.T) {
 	data, err := ioutil.ReadFile("_testdata/id_rsa")

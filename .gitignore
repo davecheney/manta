@@ -20,3 +20,8 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+mget/mget
+mls/mls
+mput/mput
+mrm/mrm
+cover.out

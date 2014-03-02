@@ -1,4 +1,8 @@
-// mput - create an object
+// Copyright 2013-2014 David Cheney and Contributors.
+// All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// mrm - remove an object
 //
 // http://apidocs.joyent.com/manta/mput.html
 package main
@@ -21,7 +25,10 @@ func main() {
 	if len(flags.Args()) < 1 {
 		log.Fatal("remote path must be supplied")
 	}
-	client := manta.DefaultClient()
+	client, err := manta.DefaultClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	resp, err := client.Delete(flags.Arg(0))
 	if err != nil {
 		log.Fatal(err)
