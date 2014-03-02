@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -35,6 +37,48 @@ func TestDefaultClient(t *testing.T) {
 	}
 	if strings.HasSuffix(c.Key, "/.ssh/id_rsa") == false {
 		t.Error("Unexpected client key: ", c.Key)
+	}
+}
+
+func TestClient(t *testing.T) {
+	MANTA_USER = os.Getenv("MANTA_USER")
+	MANTA_KEY_ID = os.Getenv("MANTA_KEY_ID")
+	if MANTA_USER != "" && MANTA_KEY_ID != "" {
+		MANTA_URL = "https://us-east.manta.joyent.com"
+		expected := "Hello, world!\n"
+		c, err := DefaultClient()
+		path := filepath.Join("/", MANTA_USER, "public", "test.txt")
+		r, err := os.Open("_testdata/test.txt")
+		if err != nil {
+			t.Fatal("Couldn't open test file: ", err)
+		}
+		resp, err := c.Put(path, r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 204 {
+			t.Fatal("Failed to put test file: ", err)
+		}
+		resp, err = c.Get(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(got) != expected {
+			t.Errorf("Expected: '%s' got: '%s'", expected, got)
+		}
+		resp, err = c.Delete(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 204 {
+			t.Error("Failed to delete test file:", err)
+		}
+	} else {
+		t.Skip("No credentials found")
 	}
 }
 
