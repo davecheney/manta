@@ -2,7 +2,7 @@
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-// mput - create an object
+// mrm - remove an object
 //
 // http://apidocs.joyent.com/manta/mput.html
 package main
