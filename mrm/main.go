@@ -1,10 +1,9 @@
-// mget - download an object from Manta.
+// mrm - remove an object
 //
-// http://apidocs.joyent.com/manta/mget.html
+// http://apidocs.joyent.com/manta/mput.html
 package main
 
 import (
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,17 +25,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := client.Get(flags.Arg(0))
+	resp, err := client.Delete(flags.Arg(0))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 204 {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Fatalf("%s", body)
 	}
-	io.Copy(os.Stdout, resp.Body)
 }
