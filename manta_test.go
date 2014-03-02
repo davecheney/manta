@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -14,6 +15,26 @@ func TestHomedir(t *testing.T) {
 	h, err := homeDir()
 	if h == "" || err != nil {
 		t.Fatal("homeDir fails on this platform", runtime.GOOS)
+	}
+}
+
+func TestDefaultClient(t *testing.T) {
+
+	c, err := DefaultClient()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.User != MANTA_USER {
+		t.Error(c.User, "!=", MANTA_USER)
+	}
+	if c.Url != MANTA_URL {
+		t.Error("URL != MANTA_URL")
+	}
+	if c.KeyId != MANTA_KEY_ID {
+		t.Error("User != MANTA_KEY_ID")
+	}
+	if strings.HasSuffix(c.Key, "/.ssh/id_rsa") == false {
+		t.Error("Unexpected client key: ", c.Key)
 	}
 }
 
