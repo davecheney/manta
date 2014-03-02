@@ -1,3 +1,8 @@
+// Copyright 2013-2014 David Cheney and Contributors.
+// All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+////////////////////////////////////////////////////////////
 // Manta implements a client for the Joyent Manta API.
 // http://apidocs.joyent.com/manta/index.html.
 //
